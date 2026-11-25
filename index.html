@@ -4,188 +4,393 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#080808">
   <title>akkun.</title>
 
   <style>
     @font-face {
-      font-family: "GyeonggiBatang";
-      src: url("./fonts/경기천년바탕OTF_Regular.otf") format("opentype");
-      font-weight: 400;
+      font-family: "MyFont";
+      src: url("./my-font.otf") format("opentype");
+      font-weight: 700;
       font-style: normal;
       font-display: swap;
     }
 
     :root {
-      color-scheme: dark;
-      --background: #111111;
-      --foreground: #eeeeee;
-      --secondary: #858585;
-      --line: #292929;
-      --dot: #777777;
+      --bg: #080808;
+      --panel: rgba(15, 15, 15, 0.78);
+      --text: #eeeeee;
+      --sub: #858585;
+      --border: rgba(255, 255, 255, 0.17);
+      --glow: rgba(255, 255, 255, 0.16);
+      --hover: rgba(255, 255, 255, 0.07);
     }
 
     [data-theme="light"] {
-      color-scheme: light;
-      --background: #f7f7f5;
-      --foreground: #202020;
-      --secondary: #777777;
-      --line: #ddddda;
-      --dot: #999999;
+      --bg: #eeeeec;
+      --panel: rgba(255, 255, 255, 0.78);
+      --text: #171717;
+      --sub: #777777;
+      --border: rgba(0, 0, 0, 0.15);
+      --glow: rgba(0, 0, 0, 0.10);
+      --hover: rgba(0, 0, 0, 0.05);
     }
 
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
       min-height: 100vh;
-      background: var(--background);
-      color: var(--foreground);
-      font-family: "GyeonggiBatang", serif;
-      transition: background 0.2s, color 0.2s;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      transition: background .25s, color .25s;
     }
 
-    header {
-      height: 76px;
-      padding: 0 7%;
+    /* Background */
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .24;
+      background:
+        radial-gradient(ellipse at 50% 45%,
+          rgba(255,255,255,.055),
+          transparent 55%),
+        repeating-linear-gradient(
+          125deg,
+          transparent 0px,
+          transparent 70px,
+          rgba(255,255,255,.018) 71px,
+          transparent 73px
+        );
+    }
+
+    /* Top controls */
+
+    .top-left {
+      position: fixed;
+      top: 20px;
+      left: 22px;
+      display: flex;
+      gap: 15px;
+      z-index: 10;
+    }
+
+    .icon-button {
+      border: none;
+      background: transparent;
+      color: var(--sub);
+      cursor: pointer;
+      font-size: 17px;
+      transition: color .2s;
+    }
+
+    .icon-button:hover {
+      color: var(--text);
+    }
+
+    /* Mini header */
+
+    .top-center {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+    }
+
+    .mini-player {
+      min-width: 185px;
+      padding: 9px 13px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--panel);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 4px 18px rgba(0,0,0,.2);
     }
 
-    .logo {
-      color: var(--foreground);
-      font-size: 21px;
+    .music-symbol {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--hover);
+      font-size: 12px;
+    }
+
+    .music-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .music-title {
+      color: var(--text);
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .music-subtitle {
+      margin-top: 3px;
+      color: var(--sub);
+      font-size: 9px;
+    }
+
+    .music-line {
+      height: 2px;
+      margin-top: 6px;
+      background: var(--border);
+      border-radius: 5px;
+    }
+
+    /* Sidebar */
+
+    .sidebar {
+      position: fixed;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      width: 125px;
+      z-index: 5;
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .sidebar a,
+    .sidebar .menu-text {
+      display: block;
+      padding: 7px 10px;
+      border-radius: 8px;
+      color: var(--sub);
       text-decoration: none;
-      letter-spacing: -1px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: .2s;
     }
 
-    #themeToggle {
-      border: 0;
-      background: transparent;
-      color: var(--secondary);
-      font-size: 19px;
-      cursor: pointer;
-      padding: 8px;
+    .sidebar a:hover,
+    .sidebar .menu-text:hover {
+      color: var(--text);
+      background: var(--hover);
     }
+
+    .sidebar .active {
+      color: var(--text);
+      background: var(--hover);
+    }
+
+    .sidebar .active::before {
+      content: "›";
+      margin-right: 8px;
+    }
+
+    /* Main */
 
     main {
-      min-height: calc(100vh - 140px);
+      min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      align-items: center;
+      padding: 100px 170px;
     }
 
-    .profile {
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
+    .profile-panel {
+      position: relative;
+      width: min(470px, 100%);
+      min-height: 220px;
+      padding: 30px 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,.35),
+        0 12px 30px var(--glow),
+        inset 0 0 20px rgba(255,255,255,.015);
+      transition: background .25s, border .25s;
     }
 
     #avatar {
-      width: 116px;
-      height: 116px;
-      border-radius: 50%;
+      width: 88px;
+      height: 88px;
       object-fit: cover;
-      background: var(--line);
-      display: block;
-      margin: 0 auto 25px;
+      border-radius: 50%;
+      background: var(--hover);
+      margin-bottom: 12px;
     }
 
     #name {
-      font-size: 27px;
-      font-weight: 400;
-      letter-spacing: -0.8px;
+      font-family: "MyFont", Arial, sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: .3px;
     }
 
     .status {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 12px;
-      color: var(--secondary);
-      font-size: 13px;
+      gap: 6px;
+      margin-top: 5px;
+      color: var(--sub);
+      font-size: 10px;
     }
 
     #statusDot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: var(--dot);
+      background: #80848e;
     }
 
     #statusMessage {
-      min-height: 20px;
-      margin-top: 10px;
-      color: var(--secondary);
-      font-size: 13px;
+      min-height: 13px;
+      margin-top: 5px;
+      color: var(--sub);
+      font-size: 10px;
+      text-align: center;
     }
 
-    .links {
+    /* Social links */
+
+    .socials {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 17px;
-      margin-top: 38px;
-      font-size: 12px;
-      letter-spacing: 1px;
+      gap: 19px;
+      margin-top: 17px;
     }
 
-    .links a,
-    .links span {
-      color: var(--secondary);
+    .socials a {
+      width: 17px;
+      height: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      opacity: .85;
       text-decoration: none;
-      transition: color 0.2s;
+      transition: opacity .2s, transform .2s;
     }
 
-    .links a:hover {
-      color: var(--foreground);
+    .socials a:hover {
+      opacity: .55;
+      transform: translateY(-2px);
     }
 
-    .separator {
-      color: var(--line) !important;
+    .socials svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
     }
+
+    /* Footer */
 
     footer {
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--secondary);
-      font-size: 11px;
+      position: fixed;
+      bottom: 17px;
+      right: 22px;
+      color: var(--sub);
+      font-size: 10px;
+      opacity: .65;
     }
 
-    @media (max-width: 480px) {
-      header {
-        padding: 0 6%;
+    /* Responsive */
+
+    @media (max-width: 700px) {
+      .sidebar {
+        position: absolute;
+        top: 75px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
       }
 
-      #avatar {
-        width: 104px;
-        height: 104px;
+      .sidebar nav {
+        flex-direction: row;
+        gap: 4px;
       }
 
-      #name {
-        font-size: 25px;
+      .sidebar a,
+      .sidebar .menu-text {
+        padding: 7px 9px;
+        font-size: 11px;
+      }
+
+      main {
+        padding: 130px 22px 70px;
+      }
+
+      .profile-panel {
+        min-height: 210px;
+      }
+
+      .top-center {
+        top: 13px;
+      }
+
+      footer {
+        right: 50%;
+        transform: translateX(50%);
       }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <a class="logo" href="./">akkun.</a>
-    <button id="themeToggle" aria-label="테마 변경">☼</button>
-  </header>
 
-  <main>
-    <section class="profile">
-      <img id="avatar" src="" alt="Discord profile">
+  <!-- Top controls -->
+  <div class="top-left">
+    <button class="icon-button" id="themeToggle" aria-label="테마 변경">☼</button>
+  </div>
+
+  <!-- Mini player-style header -->
+  <div class="top-center">
+    <div class="mini-player">
+      <div class="music-symbol">♫</div>
+      <div class="music-info">
+        <div class="music-title">akkun.</div>
+        <div class="music-subtitle">PERSONAL PROFILE</div>
+        <div class="music-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav>
+      <a href="#home" class="active">홈</a>
+      <span class="menu-text" title="Blue Archive · MSFS2020">게임</span>
+      <a href="https://www.roblox.com/ko/users/3966349192/profile"
+         target="_blank" rel="noopener noreferrer">ROBLOX</a>
+      <a href="mailto:akkun1@proton.me">연락하기</a>
+    </nav>
+  </aside>
+
+  <!-- Profile -->
+  <main id="home">
+    <section class="profile-panel">
+
+      <img id="avatar" src="" alt="Discord Avatar">
 
       <h1 id="name">akkun</h1>
 
@@ -196,23 +401,29 @@
 
       <p id="statusMessage"></p>
 
-      <nav class="links">
-        <a href="mailto:akkun1@proton.me">EMAIL</a>
-        <span class="separator">/</span>
-        <span title="Blue Archive · MSFS2020">GAMES</span>
-        <span class="separator">/</span>
-        <a
-          href="https://www.roblox.com/ko/users/3966349192/profile"
-          target="_blank"
-          rel="noopener noreferrer"
-        >ROBLOX</a>
-      </nav>
+      <div class="socials">
+
+        <!-- Email -->
+        <a href="mailto:akkun1@proton.me" aria-label="Email">
+          <svg viewBox="0 0 24 24">
+            <path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 18.5zm2 .1v.5l8 5.6 8-5.6v-.5a.5.5 0 0 0-.5-.5h-15a.5.5 0 0 0-.5.5m16 2.9-7.4 5.2a1 1 0 0 1-1.2 0L4 8.5v10a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5z"/>
+          </svg>
+        </a>
+
+        <!-- Roblox -->
+        <a href="https://www.roblox.com/ko/users/3966349192/profile"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Roblox">
+          <svg viewBox="0 0 24 24">
+            <path d="M5.2 1.7 22.3 5.2l-3.5 17.1L1.7 18.8zm7.1 8.1-1.1 5.2 5.2 1.1 1.1-5.2z"/>
+          </svg>
+        </a>
+
+      </div>
     </section>
   </main>
 
-  <footer>
-    © 2026 akkun.
-  </footer>
+  <footer>© 2026 akkun.</footer>
 
   <script>
     const API = "https://profile-api.leesan0905.workers.dev";
@@ -281,14 +492,11 @@
       localStorage.setItem("akkun-theme", theme);
     }
 
-    const savedTheme = localStorage.getItem("akkun-theme");
-    applyTheme(savedTheme || "dark");
+    applyTheme(localStorage.getItem("akkun-theme") || "dark");
 
     themeToggle.addEventListener("click", () => {
-      const currentTheme =
-        document.documentElement.dataset.theme;
-
-      applyTheme(currentTheme === "dark" ? "light" : "dark");
+      const current = document.documentElement.dataset.theme;
+      applyTheme(current === "dark" ? "light" : "dark");
     });
 
     // Initial load
@@ -299,5 +507,6 @@
     setInterval(loadStatus, 15000);
     setInterval(loadProfile, 60000);
   </script>
+
 </body>
 </html>
