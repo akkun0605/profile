@@ -2,511 +2,819 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080808">
-  <title>akkun.</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<title>akkun.</title>
 
-  <style>
-    @font-face {
-      font-family: "MyFont";
-      src: url("./my-font.otf") format("opentype");
-      font-weight: 700;
-      font-style: normal;
-      font-display: swap;
-    }
+<style>
+@font-face {
+  font-family: "MyFont";
+  src: url("./my-font.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
-    :root {
-      --bg: #080808;
-      --panel: rgba(15, 15, 15, 0.78);
-      --text: #eeeeee;
-      --sub: #858585;
-      --border: rgba(255, 255, 255, 0.17);
-      --glow: rgba(255, 255, 255, 0.16);
-      --hover: rgba(255, 255, 255, 0.07);
-    }
+:root {
+  --bg: #080808;
+  --panel: rgba(17,17,17,.88);
+  --text: #eeeeee;
+  --sub: #929292;
+  --border: rgba(255,255,255,.15);
+  --hover: rgba(255,255,255,.07);
+  --shadow: rgba(255,255,255,.07);
+}
 
-    [data-theme="light"] {
-      --bg: #eeeeec;
-      --panel: rgba(255, 255, 255, 0.78);
-      --text: #171717;
-      --sub: #777777;
-      --border: rgba(0, 0, 0, 0.15);
-      --glow: rgba(0, 0, 0, 0.10);
-      --hover: rgba(0, 0, 0, 0.05);
-    }
+[data-theme="light"] {
+  --bg: #eeeeec;
+  --panel: rgba(255,255,255,.9);
+  --text: #191919;
+  --sub: #777777;
+  --border: rgba(0,0,0,.15);
+  --hover: rgba(0,0,0,.06);
+  --shadow: rgba(0,0,0,.08);
+}
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    body {
-      min-height: 100vh;
-      overflow-x: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-      transition: background .25s, color .25s;
-    }
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  transition: background .25s, color .25s;
+}
 
-    /* Background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 45%,
+      rgba(255,255,255,.065), transparent 55%),
+    repeating-linear-gradient(
+      125deg,
+      transparent 0,
+      transparent 70px,
+      rgba(255,255,255,.015) 71px,
+      transparent 73px
+    );
+}
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      opacity: .24;
-      background:
-        radial-gradient(ellipse at 50% 45%,
-          rgba(255,255,255,.055),
-          transparent 55%),
-        repeating-linear-gradient(
-          125deg,
-          transparent 0px,
-          transparent 70px,
-          rgba(255,255,255,.018) 71px,
-          transparent 73px
-        );
-    }
+/* 상단 테마 버튼 */
 
-    /* Top controls */
+.top-left {
+  position: fixed;
+  top: 22px;
+  left: 25px;
+  z-index: 10;
+}
 
-    .top-left {
-      position: fixed;
-      top: 20px;
-      left: 22px;
-      display: flex;
-      gap: 15px;
-      z-index: 10;
-    }
+.icon-button {
+  border: none;
+  background: transparent;
+  color: var(--sub);
+  font-size: 19px;
+  cursor: pointer;
+}
 
-    .icon-button {
-      border: none;
-      background: transparent;
-      color: var(--sub);
-      cursor: pointer;
-      font-size: 17px;
-      transition: color .2s;
-    }
+.icon-button:hover {
+  color: var(--text);
+}
 
-    .icon-button:hover {
-      color: var(--text);
-    }
+/* 음악 플레이어 */
 
-    /* Mini header */
+.music-player {
+  position: fixed;
+  top: 17px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 285px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 5px 25px rgba(0,0,0,.2);
+}
 
-    .top-center {
-      position: fixed;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
-    }
+.player-top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
 
-    .mini-player {
-      min-width: 185px;
-      padding: 9px 13px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: var(--panel);
-      backdrop-filter: blur(15px);
-      box-shadow: 0 4px 18px rgba(0,0,0,.2);
-    }
+.album-art {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--hover);
+  display: grid;
+  place-items: center;
+  color: var(--sub);
+  font-size: 19px;
+}
 
-    .music-symbol {
-      width: 25px;
-      height: 25px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--hover);
-      font-size: 12px;
-    }
+.track-info {
+  flex: 1;
+  min-width: 0;
+}
 
-    .music-info {
-      flex: 1;
-      min-width: 0;
-    }
+.track-title {
+  font-size: 12px;
+  font-weight: bold;
+}
 
-    .music-title {
-      color: var(--text);
-      font-size: 11px;
-      font-weight: bold;
-    }
+.track-artist {
+  margin-top: 4px;
+  color: var(--sub);
+  font-size: 10px;
+}
 
-    .music-subtitle {
-      margin-top: 3px;
-      color: var(--sub);
-      font-size: 9px;
-    }
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-    .music-line {
-      height: 2px;
-      margin-top: 6px;
-      background: var(--border);
-      border-radius: 5px;
-    }
+.player-controls button {
+  border: none;
+  background: transparent;
+  color: var(--sub);
+  cursor: pointer;
+  font-size: 15px;
+}
 
-    /* Sidebar */
+.player-controls button:disabled {
+  opacity: .35;
+  cursor: default;
+}
 
-    .sidebar {
-      position: fixed;
-      top: 50%;
-      left: 15px;
-      transform: translateY(-50%);
-      width: 125px;
-      z-index: 5;
-    }
+.player-controls .play-button {
+  color: var(--text);
+  font-size: 19px;
+}
 
-    .sidebar nav {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+.player-progress {
+  width: 100%;
+  height: 2px;
+  margin-top: 11px;
+  background: var(--border);
+  border-radius: 5px;
+}
 
-    .sidebar a,
-    .sidebar .menu-text {
-      display: block;
-      padding: 7px 10px;
-      border-radius: 8px;
-      color: var(--sub);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      transition: .2s;
-    }
+.player-progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: var(--text);
+}
 
-    .sidebar a:hover,
-    .sidebar .menu-text:hover {
-      color: var(--text);
-      background: var(--hover);
-    }
+/* 왼쪽 메뉴 */
 
-    .sidebar .active {
-      color: var(--text);
-      background: var(--hover);
-    }
+.sidebar {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  width: 130px;
+  z-index: 5;
+}
 
-    .sidebar .active::before {
-      content: "›";
-      margin-right: 8px;
-    }
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
-    /* Main */
+.sidebar a,
+.sidebar .menu-text {
+  display: block;
+  padding: 9px 11px;
+  border-radius: 8px;
+  color: var(--sub);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: .2s;
+}
 
-    main {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 100px 170px;
-    }
+.sidebar a:hover,
+.sidebar .menu-text:hover {
+  color: var(--text);
+  background: var(--hover);
+}
 
-    .profile-panel {
-      position: relative;
-      width: min(470px, 100%);
-      min-height: 220px;
-      padding: 30px 25px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      background: var(--panel);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow:
-        0 12px 28px rgba(0,0,0,.35),
-        0 12px 30px var(--glow),
-        inset 0 0 20px rgba(255,255,255,.015);
-      transition: background .25s, border .25s;
-    }
+.sidebar .active {
+  color: var(--text);
+  background: var(--hover);
+}
 
-    #avatar {
-      width: 88px;
-      height: 88px;
-      object-fit: cover;
-      border-radius: 50%;
-      background: var(--hover);
-      margin-bottom: 12px;
-    }
+.sidebar .active::before {
+  content: "›";
+  margin-right: 8px;
+}
 
-    #name {
-      font-family: "MyFont", Arial, sans-serif;
-      font-size: 21px;
-      font-weight: 700;
-      letter-spacing: .3px;
-    }
+/* 중앙 프로필 */
 
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 5px;
-      color: var(--sub);
-      font-size: 10px;
-    }
+main {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 110px 170px;
+}
 
-    #statusDot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #80848e;
-    }
+.profile-panel {
+  width: min(540px, 100%);
+  min-height: 330px;
+  padding: 48px 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 15px 45px rgba(0,0,0,.35),
+    0 0 35px var(--shadow),
+    inset 0 0 25px rgba(255,255,255,.015);
+}
 
-    #statusMessage {
-      min-height: 13px;
-      margin-top: 5px;
-      color: var(--sub);
-      font-size: 10px;
-      text-align: center;
-    }
+#avatar {
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  border-radius: 50%;
+  background: var(--hover);
+  margin-bottom: 17px;
+}
 
-    /* Social links */
+#name {
+  font-family: "MyFont", Arial, sans-serif;
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
 
-    .socials {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 19px;
-      margin-top: 17px;
-    }
+.status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 9px;
+  color: var(--sub);
+  font-size: 13px;
+}
 
-    .socials a {
-      width: 17px;
-      height: 17px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text);
-      opacity: .85;
-      text-decoration: none;
-      transition: opacity .2s, transform .2s;
-    }
+#statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #80848e;
+}
 
-    .socials a:hover {
-      opacity: .55;
-      transform: translateY(-2px);
-    }
+#statusMessage {
+  min-height: 18px;
+  margin-top: 8px;
+  color: var(--sub);
+  font-size: 12px;
+  text-align: center;
+}
 
-    .socials svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-    }
+/* 소셜 아이콘 */
 
-    /* Footer */
+.socials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 23px;
+  margin-top: 27px;
+}
 
-    footer {
-      position: fixed;
-      bottom: 17px;
-      right: 22px;
-      color: var(--sub);
-      font-size: 10px;
-      opacity: .65;
-    }
+.social-button {
+  width: 27px;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  opacity: .85;
+  cursor: pointer;
+  transition: .2s;
+}
 
-    /* Responsive */
+.social-button:hover {
+  opacity: .55;
+  transform: translateY(-2px);
+}
 
-    @media (max-width: 700px) {
-      .sidebar {
-        position: absolute;
-        top: 75px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-      }
+.social-button svg {
+  width: 21px;
+  height: 21px;
+  fill: currentColor;
+}
 
-      .sidebar nav {
-        flex-direction: row;
-        gap: 4px;
-      }
+.roblox-icon {
+  width: 23px;
+  height: 23px;
+  object-fit: contain;
+  filter: none;
+}
 
-      .sidebar a,
-      .sidebar .menu-text {
-        padding: 7px 9px;
-        font-size: 11px;
-      }
+/* 팝업 공통 */
 
-      main {
-        padding: 130px 22px 70px;
-      }
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(7px);
+}
 
-      .profile-panel {
-        min-height: 210px;
-      }
+.modal-overlay.show {
+  display: flex;
+}
 
-      .top-center {
-        top: 13px;
-      }
+.modal {
+  width: min(460px, 100%);
+  padding: 25px 24px 23px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 23px;
+  background: #101010;
+  color: #eeeeee;
+  box-shadow: 0 15px 55px rgba(0,0,0,.55);
+  animation: modalIn .18s ease-out;
+}
 
-      footer {
-        right: 50%;
-        transform: translateX(50%);
-      }
-    }
-  </style>
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.close-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 50%;
+  background: #1c1c1c;
+  color: #999;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.modal-description {
+  color: #999;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.modal-link {
+  display: block;
+  margin-top: 5px;
+  color: #eeeeee;
+  font-size: 13px;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.modal-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #999;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.modal-actions .primary {
+  padding: 11px 19px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: #191919;
+  color: #eeeeee;
+  font-weight: bold;
+}
+
+.modal-actions button:hover {
+  filter: brightness(1.25);
+}
+
+/* 이메일 팝업 */
+
+.email-address {
+  margin-top: 13px;
+  padding: 13px 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 10px;
+  background: #191919;
+  color: #eeeeee;
+  font-size: 14px;
+  user-select: text;
+  overflow-wrap: anywhere;
+}
+
+/* 푸터 */
+
+footer {
+  position: fixed;
+  bottom: 18px;
+  right: 23px;
+  color: var(--sub);
+  font-size: 10px;
+  opacity: .65;
+}
+
+/* 모바일 */
+
+@media (max-width: 700px) {
+  .sidebar {
+    position: absolute;
+    top: 95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    gap: 3px;
+  }
+
+  .sidebar a,
+  .sidebar .menu-text {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .music-player {
+    top: 13px;
+    width: 240px;
+  }
+
+  main {
+    padding: 160px 20px 75px;
+  }
+
+  .profile-panel {
+    min-height: 310px;
+    padding: 40px 20px;
+  }
+
+  #avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  #name {
+    font-size: 25px;
+  }
+
+  footer {
+    right: 50%;
+    transform: translateX(50%);
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- Top controls -->
-  <div class="top-left">
-    <button class="icon-button" id="themeToggle" aria-label="테마 변경">☼</button>
-  </div>
+<!-- 테마 -->
+<div class="top-left">
+  <button class="icon-button" id="themeToggle" aria-label="테마 변경">☼</button>
+</div>
 
-  <!-- Mini player-style header -->
-  <div class="top-center">
-    <div class="mini-player">
-      <div class="music-symbol">♫</div>
-      <div class="music-info">
-        <div class="music-title">akkun.</div>
-        <div class="music-subtitle">PERSONAL PROFILE</div>
-        <div class="music-line"></div>
-      </div>
+<!-- 음악 플레이어 -->
+<div class="music-player">
+  <div class="player-top">
+    <div class="album-art">♫</div>
+
+    <div class="track-info">
+      <div class="track-title" id="trackTitle">재생할 음악이 없습니다</div>
+      <div class="track-artist" id="trackArtist">PLAYLIST · 준비 중</div>
+    </div>
+
+    <div class="player-controls">
+      <button disabled aria-label="이전 곡">|◀</button>
+      <button class="play-button" disabled aria-label="재생">▶</button>
+      <button disabled aria-label="다음 곡">▶|</button>
     </div>
   </div>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <nav>
-      <a href="#home" class="active">홈</a>
-      <span class="menu-text" title="Blue Archive · MSFS2020">게임</span>
-      <a href="https://www.roblox.com/ko/users/3966349192/profile"
-         target="_blank" rel="noopener noreferrer">ROBLOX</a>
-      <a href="mailto:akkun1@proton.me">연락하기</a>
-    </nav>
-  </aside>
+  <div class="player-progress">
+    <span></span>
+  </div>
+</div>
 
-  <!-- Profile -->
-  <main id="home">
-    <section class="profile-panel">
+<!-- 왼쪽 메뉴 -->
+<aside class="sidebar">
+  <nav>
+    <a href="#home" class="active">홈</a>
+    <span class="menu-text" title="Blue Archive · MSFS2020">게임</span>
+    <a href="https://www.roblox.com/ko/users/3966349192/profile"
+       target="_blank" rel="noopener noreferrer">ROBLOX</a>
+    <a href="#" id="emailMenu">EMAIL</a>
+  </nav>
+</aside>
 
-      <img id="avatar" src="" alt="Discord Avatar">
+<!-- 프로필 -->
+<main id="home">
+  <section class="profile-panel">
 
-      <h1 id="name">akkun</h1>
+    <img id="avatar" src="" alt="Discord Avatar">
 
-      <div class="status">
-        <span id="statusDot"></span>
-        <span id="statusText">Loading...</span>
-      </div>
+    <h1 id="name">akkun</h1>
 
-      <p id="statusMessage"></p>
+    <div class="status">
+      <span id="statusDot"></span>
+      <span id="statusText">불러오는 중</span>
+    </div>
 
-      <div class="socials">
+    <p id="statusMessage"></p>
 
-        <!-- Email -->
-        <a href="mailto:akkun1@proton.me" aria-label="Email">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 18.5zm2 .1v.5l8 5.6 8-5.6v-.5a.5.5 0 0 0-.5-.5h-15a.5.5 0 0 0-.5.5m16 2.9-7.4 5.2a1 1 0 0 1-1.2 0L4 8.5v10a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5z"/>
-          </svg>
-        </a>
+    <div class="socials">
 
-        <!-- Roblox -->
-        <a href="https://www.roblox.com/ko/users/3966349192/profile"
-           target="_blank" rel="noopener noreferrer"
-           aria-label="Roblox">
-          <svg viewBox="0 0 24 24">
-            <path d="M5.2 1.7 22.3 5.2l-3.5 17.1L1.7 18.8zm7.1 8.1-1.1 5.2 5.2 1.1 1.1-5.2z"/>
-          </svg>
-        </a>
+      <!-- 이메일 -->
+      <button class="social-button" id="emailButton"
+              aria-label="이메일 주소 보기">
+        <svg viewBox="0 0 24 24">
+          <path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 18.5zm2 .1v.5l8 5.6 8-5.6v-.5a.5.5 0 0 0-.5-.5h-15a.5.5 0 0 0-.5.5m16 2.9-7.4 5.2a1 1 0 0 1-1.2 0L4 8.5v10a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5z"/>
+        </svg>
+      </button>
 
-      </div>
-    </section>
-  </main>
+      <!-- Roblox -->
+      <button class="social-button" id="robloxButton"
+              aria-label="Roblox 프로필 이동">
+        <img
+          class="roblox-icon"
+          src="https://images.icon-icons.com/3914/PNG/512/roblox_logo_icon_248636.png"
+          alt="Roblox"
+        >
+      </button>
 
-  <footer>© 2026 akkun.</footer>
+    </div>
+  </section>
+</main>
 
-  <script>
-    const API = "https://profile-api.leesan0905.workers.dev";
+<footer>© 2026 akkun.</footer>
 
-    const statusInfo = {
-      online: {
-        text: "Online",
-        color: "#23a55a"
-      },
-      idle: {
-        text: "Away",
-        color: "#f0b232"
-      },
-      dnd: {
-        text: "Do Not Disturb",
-        color: "#f23f43"
-      },
-      offline: {
-        text: "Offline",
-        color: "#80848e"
-      }
-    };
+<!-- Roblox 확인 팝업 -->
+<div class="modal-overlay" id="robloxModal">
+  <div class="modal" role="dialog" aria-modal="true"
+       aria-labelledby="robloxTitle">
 
-    async function loadProfile() {
-      try {
-        const response = await fetch(API + "/profile");
-        if (!response.ok) throw new Error("Profile request failed");
+    <div class="modal-header">
+      <h2 class="modal-title" id="robloxTitle">잠시만요!!</h2>
+      <button class="close-button" data-close="robloxModal"
+              aria-label="닫기">×</button>
+    </div>
 
-        const data = await response.json();
+    <p class="modal-description">
+      외부 사이트로 이동하고 계세요.
+    </p>
 
-        document.getElementById("name").textContent =
-          data.display_name || data.username || "akkun";
+    <a class="modal-link"
+       href="https://www.roblox.com/users/3966349192/profile"
+       target="_blank" rel="noopener noreferrer">
+      https://www.roblox.com/users/3966349192/...
+    </a>
 
-        if (data.avatar_url) {
-          document.getElementById("avatar").src = data.avatar_url;
-        }
-      } catch (error) {
-        console.error("Profile loading error:", error);
-      }
+    <div class="modal-actions">
+      <button data-close="robloxModal">취소</button>
+      <button class="primary" id="robloxConfirm">
+        ↗ 들어가기
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 이메일 팝업 -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal" role="dialog" aria-modal="true"
+       aria-labelledby="emailTitle">
+
+    <div class="modal-header">
+      <h2 class="modal-title" id="emailTitle">이메일</h2>
+      <button class="close-button" data-close="emailModal"
+              aria-label="닫기">×</button>
+    </div>
+
+    <p class="modal-description">
+      아래 이메일 주소로 연락할 수 있습니다.
+    </p>
+
+    <div class="email-address" id="emailAddress">
+      akkun1@proton.me
+    </div>
+
+    <div class="modal-actions">
+      <button data-close="emailModal">닫기</button>
+      <button class="primary" id="copyEmail">복사하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://profile-api.leesan0905.workers.dev";
+
+const statusInfo = {
+  online: {
+    text: "온라인",
+    color: "#23a55a"
+  },
+  idle: {
+    text: "다른 용무 중",
+    color: "#f0b232"
+  },
+  dnd: {
+    text: "방해 금지",
+    color: "#f23f43"
+  },
+  offline: {
+    text: "오프라인",
+    color: "#80848e"
+  }
+};
+
+/* Discord 프로필 */
+async function loadProfile() {
+  try {
+    const response = await fetch(API + "/profile");
+    if (!response.ok) throw new Error("Profile request failed");
+
+    const data = await response.json();
+
+    document.getElementById("name").textContent =
+      data.display_name || data.username || "akkun";
+
+    if (data.avatar_url) {
+      document.getElementById("avatar").src = data.avatar_url;
     }
+  } catch (error) {
+    console.error("Profile loading error:", error);
+  }
+}
 
-    async function loadStatus() {
-      try {
-        const response = await fetch(API + "/status");
-        if (!response.ok) throw new Error("Status request failed");
+/* 상태 */
+async function loadStatus() {
+  try {
+    const response = await fetch(API + "/status");
+    if (!response.ok) throw new Error("Status request failed");
 
-        const data = await response.json();
-        const info = statusInfo[data.status] || statusInfo.offline;
+    const data = await response.json();
+    const info = statusInfo[data.status] || statusInfo.offline;
 
-        document.getElementById("statusText").textContent = info.text;
-        document.getElementById("statusDot").style.background = info.color;
-        document.getElementById("statusMessage").textContent =
-          data.message || "";
-      } catch (error) {
-        console.error("Status loading error:", error);
-        document.getElementById("statusText").textContent = "Offline";
-      }
+    document.getElementById("statusText").textContent = info.text;
+    document.getElementById("statusDot").style.background = info.color;
+    document.getElementById("statusMessage").textContent =
+      data.message || "";
+  } catch (error) {
+    console.error("Status loading error:", error);
+    document.getElementById("statusText").textContent = "오프라인";
+  }
+}
+
+/* 테마 */
+const themeToggle = document.getElementById("themeToggle");
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeToggle.textContent = theme === "dark" ? "☼" : "☾";
+  localStorage.setItem("akkun-theme", theme);
+}
+
+applyTheme(localStorage.getItem("akkun-theme") || "dark");
+
+themeToggle.addEventListener("click", () => {
+  const current = document.documentElement.dataset.theme;
+  applyTheme(current === "dark" ? "light" : "dark");
+});
+
+/* 팝업 */
+function openModal(id) {
+  document.getElementById(id).classList.add("show");
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove("show");
+}
+
+document.querySelectorAll("[data-close]").forEach(button => {
+  button.addEventListener("click", () => {
+    closeModal(button.dataset.close);
+  });
+});
+
+document.querySelectorAll(".modal-overlay").forEach(overlay => {
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) {
+      overlay.classList.remove("show");
     }
+  });
+});
 
-    // Theme
-    const themeToggle = document.getElementById("themeToggle");
-
-    function applyTheme(theme) {
-      document.documentElement.dataset.theme = theme;
-      themeToggle.textContent = theme === "dark" ? "☼" : "☾";
-      localStorage.setItem("akkun-theme", theme);
-    }
-
-    applyTheme(localStorage.getItem("akkun-theme") || "dark");
-
-    themeToggle.addEventListener("click", () => {
-      const current = document.documentElement.dataset.theme;
-      applyTheme(current === "dark" ? "light" : "dark");
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    document.querySelectorAll(".modal-overlay").forEach(modal => {
+      modal.classList.remove("show");
     });
+  }
+});
 
-    // Initial load
-    loadProfile();
-    loadStatus();
+/* Roblox 팝업 */
+document.getElementById("robloxButton").addEventListener("click", () => {
+  openModal("robloxModal");
+});
 
-    // Automatic refresh
-    setInterval(loadStatus, 15000);
-    setInterval(loadProfile, 60000);
-  </script>
+document.getElementById("robloxConfirm").addEventListener("click", () => {
+  window.open(
+    "https://www.roblox.com/users/3966349192/profile",
+    "_blank",
+    "noopener,noreferrer"
+  );
+  closeModal("robloxModal");
+});
+
+/* 이메일 팝업 */
+function showEmail() {
+  openModal("emailModal");
+}
+
+document.getElementById("emailButton").addEventListener("click", showEmail);
+document.getElementById("emailMenu").addEventListener("click", event => {
+  event.preventDefault();
+  showEmail();
+});
+
+/* 이메일 복사 */
+document.getElementById("copyEmail").addEventListener("click", async () => {
+  const email = "akkun1@proton.me";
+  const button = document.getElementById("copyEmail");
+
+  try {
+    await navigator.clipboard.writeText(email);
+    button.textContent = "복사 완료";
+  } catch (error) {
+    button.textContent = "복사 실패";
+  }
+
+  setTimeout(() => {
+    button.textContent = "복사하기";
+  }, 1600);
+});
+
+/* 최초 실행 */
+loadProfile();
+loadStatus();
+
+/* 자동 갱신 */
+setInterval(loadStatus, 15000);
+setInterval(loadProfile, 60000);
+</script>
 
 </body>
 </html>
