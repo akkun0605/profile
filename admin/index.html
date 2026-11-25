@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>akkun Profile | Admin</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #101116;
+      color: #f4f4f5;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .panel {
+      width: 100%;
+      max-width: 400px;
+      padding: 28px;
+      border: 1px solid #30313b;
+      border-radius: 18px;
+      background: #191a22;
+    }
+    h1 { font-size: 23px; margin-top: 0; }
+    p { color: #a5a6b0; font-size: 14px; }
+    input, select, button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 12px;
+      border-radius: 9px;
+      border: 1px solid #383945;
+      background: #242530;
+      color: white;
+      font-size: 15px;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      background: #5865f2;
+      font-weight: bold;
+    }
+    button:hover { opacity: .85; }
+    #editor { display: none; }
+    #result { min-height: 20px; margin-top: 14px; }
+    .logout { background: #343541; }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <h1>akkun Profile</h1>
+    <p>Administrator Dashboard</p>
+
+    <section id="login">
+      <h3>관리자 로그인</h3>
+      <input id="password" type="password"
+        placeholder="관리자 비밀번호">
+      <button id="loginBtn">로그인</button>
+    </section>
+
+    <section id="editor">
+      <h3>프로필 상태 설정</h3>
+
+      <label for="status">현재 상태</label>
+      <select id="status">
+        <option value="online">온라인</option>
+        <option value="idle">자리 비움</option>
+        <option value="dnd">다른 용무 중</option>
+        <option value="offline">오프라인</option>
+      </select>
+
+      <label for="message">상태 메시지</label>
+      <input id="message" type="text"
+        maxlength="100" placeholder="상태 메시지 입력">
+
+      <button id="saveBtn">변경 사항 저장</button>
+      <button id="logoutBtn" class="logout">로그아웃</button>
+    </section>
+
+    <p id="result"></p>
+  </main>
+
+  <script>
+    const API = "https://profile-api.leesan0905.workers.dev";
+
+    const loginSection = document.getElementById("login");
+    const editor = document.getElementById("editor");
+    const result = document.getElementById("result");
+
+    let token = null;
+
+    async function login() {
+      const password = document.getElementById("password").value;
+
+      try {
+        const response = await fetch(API + "/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          result.textContent = data.error || "로그인 실패";
+          return;
+        }
+
+        token = data.token;
+        loginSection.style.display = "none";
+        editor.style.display = "block";
+        result.textContent = "로그인되었습니다.";
+
+        await loadStatus();
+      } catch {
+        result.textContent = "서버에 연결할 수 없습니다.";
+      }
+    }
+
+    async function loadStatus() {
+      try {
+        const response = await fetch(API + "/status");
+        const data = await response.json();
+
+        document.getElementById("status").value = data.status;
+        document.getElementById("message").value = data.message || "";
+      } catch {
+        result.textContent = "현재 상태를 불러오지 못했습니다.";
+      }
+    }
+
+    async function saveStatus() {
+      try {
+        const response = await fetch(API + "/admin/status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+            status: document.getElementById("status").value,
+            message: document.getElementById("message").value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          result.textContent = data.error || "저장 실패";
+          return;
+        }
+
+        result.textContent = "상태가 저장되었습니다.";
+      } catch {
+        result.textContent = "서버 연결에 실패했습니다.";
+      }
+    }
+
+    function logout() {
+      token = null;
+      document.getElementById("password").value = "";
+      loginSection.style.display = "block";
+      editor.style.display = "none";
+      result.textContent = "로그아웃되었습니다.";
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", login);
+    document.getElementById("saveBtn").addEventListener("click", saveStatus);
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+  </script>
+</body>
+</html>
