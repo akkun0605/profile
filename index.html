@@ -69,8 +69,6 @@ body::before {
     );
 }
 
-/* 상단 테마 버튼 */
-
 .top-left {
   position: fixed;
   top: 22px;
@@ -179,7 +177,7 @@ body::before {
   background: var(--text);
 }
 
-/* 왼쪽 메뉴 */
+/* 사이드바 */
 
 .sidebar {
   position: fixed;
@@ -224,7 +222,7 @@ body::before {
   margin-right: 8px;
 }
 
-/* 중앙 프로필 */
+/* 프로필 */
 
 main {
   min-height: 100vh;
@@ -332,10 +330,15 @@ main {
   width: 23px;
   height: 23px;
   object-fit: contain;
-  filter: none;
+  filter: grayscale(1) brightness(0) invert(1);
+  transition: opacity .2s, filter .2s;
 }
 
-/* 팝업 공통 */
+[data-theme="light"] .roblox-icon {
+  filter: grayscale(1) brightness(0);
+}
+
+/* 팝업 */
 
 .modal-overlay {
   position: fixed;
@@ -406,10 +409,10 @@ main {
 
 .modal-link {
   display: block;
-  margin-top: 5px;
+  margin-top: 8px;
   color: #eeeeee;
   font-size: 13px;
-  font-weight: bold;
+  line-height: 1.7;
   overflow-wrap: anywhere;
 }
 
@@ -443,7 +446,7 @@ main {
   filter: brightness(1.25);
 }
 
-/* 이메일 팝업 */
+/* 이메일 */
 
 .email-address {
   margin-top: 13px;
@@ -523,34 +526,28 @@ footer {
 
 <body>
 
-<!-- 테마 -->
 <div class="top-left">
   <button class="icon-button" id="themeToggle" aria-label="테마 변경">☼</button>
 </div>
 
-<!-- 음악 플레이어 -->
 <div class="music-player">
   <div class="player-top">
     <div class="album-art">♫</div>
-
     <div class="track-info">
       <div class="track-title" id="trackTitle">재생할 음악이 없습니다</div>
       <div class="track-artist" id="trackArtist">PLAYLIST · 준비 중</div>
     </div>
-
     <div class="player-controls">
       <button disabled aria-label="이전 곡">|◀</button>
       <button class="play-button" disabled aria-label="재생">▶</button>
       <button disabled aria-label="다음 곡">▶|</button>
     </div>
   </div>
-
   <div class="player-progress">
     <span></span>
   </div>
 </div>
 
-<!-- 왼쪽 메뉴 -->
 <aside class="sidebar">
   <nav>
     <a href="#home" class="active">홈</a>
@@ -561,12 +558,9 @@ footer {
   </nav>
 </aside>
 
-<!-- 프로필 -->
 <main id="home">
   <section class="profile-panel">
-
     <img id="avatar" src="" alt="Discord Avatar">
-
     <h1 id="name">akkun</h1>
 
     <div class="status">
@@ -577,8 +571,6 @@ footer {
     <p id="statusMessage"></p>
 
     <div class="socials">
-
-      <!-- 이메일 -->
       <button class="social-button" id="emailButton"
               aria-label="이메일 주소 보기">
         <svg viewBox="0 0 24 24">
@@ -586,23 +578,20 @@ footer {
         </svg>
       </button>
 
-      <!-- Roblox -->
       <button class="social-button" id="robloxButton"
               aria-label="Roblox 프로필 이동">
         <img
           class="roblox-icon"
           src="https://images.icon-icons.com/3914/PNG/512/roblox_logo_icon_248636.png"
-          alt="Roblox"
-        >
+          alt="Roblox">
       </button>
-
     </div>
   </section>
 </main>
 
 <footer>© 2026 akkun.</footer>
 
-<!-- Roblox 확인 팝업 -->
+<!-- Roblox 팝업 -->
 <div class="modal-overlay" id="robloxModal">
   <div class="modal" role="dialog" aria-modal="true"
        aria-labelledby="robloxTitle">
@@ -617,11 +606,10 @@ footer {
       외부 사이트로 이동하고 계세요.
     </p>
 
-    <a class="modal-link"
-       href="https://www.roblox.com/users/3966349192/profile"
-       target="_blank" rel="noopener noreferrer">
-      https://www.roblox.com/users/3966349192/...
-    </a>
+    <p class="modal-link">
+      링크 <span>https://www.roblox.com/users/3966349192/...</span> 를
+      새 탭에서 열까요?
+    </p>
 
     <div class="modal-actions">
       <button data-close="robloxModal">취소</button>
@@ -662,25 +650,12 @@ footer {
 const API = "https://profile-api.leesan0905.workers.dev";
 
 const statusInfo = {
-  online: {
-    text: "온라인",
-    color: "#23a55a"
-  },
-  idle: {
-    text: "다른 용무 중",
-    color: "#f0b232"
-  },
-  dnd: {
-    text: "방해 금지",
-    color: "#f23f43"
-  },
-  offline: {
-    text: "오프라인",
-    color: "#80848e"
-  }
+  online: { text: "온라인", color: "#23a55a" },
+  idle: { text: "다른 용무 중", color: "#f0b232" },
+  dnd: { text: "방해 금지", color: "#f23f43" },
+  offline: { text: "오프라인", color: "#80848e" }
 };
 
-/* Discord 프로필 */
 async function loadProfile() {
   try {
     const response = await fetch(API + "/profile");
@@ -699,7 +674,6 @@ async function loadProfile() {
   }
 }
 
-/* 상태 */
 async function loadStatus() {
   try {
     const response = await fetch(API + "/status");
@@ -765,7 +739,7 @@ document.addEventListener("keydown", event => {
   }
 });
 
-/* Roblox 팝업 */
+/* Roblox */
 document.getElementById("robloxButton").addEventListener("click", () => {
   openModal("robloxModal");
 });
@@ -779,18 +753,18 @@ document.getElementById("robloxConfirm").addEventListener("click", () => {
   closeModal("robloxModal");
 });
 
-/* 이메일 팝업 */
+/* 이메일 */
 function showEmail() {
   openModal("emailModal");
 }
 
 document.getElementById("emailButton").addEventListener("click", showEmail);
+
 document.getElementById("emailMenu").addEventListener("click", event => {
   event.preventDefault();
   showEmail();
 });
 
-/* 이메일 복사 */
 document.getElementById("copyEmail").addEventListener("click", async () => {
   const email = "akkun1@proton.me";
   const button = document.getElementById("copyEmail");
@@ -811,7 +785,6 @@ document.getElementById("copyEmail").addEventListener("click", async () => {
 loadProfile();
 loadStatus();
 
-/* 자동 갱신 */
 setInterval(loadStatus, 15000);
 setInterval(loadProfile, 60000);
 </script>
