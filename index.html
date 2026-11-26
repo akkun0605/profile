@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -26,6 +27,8 @@
       --shadow: rgba(0,0,0,.28);
       --accent: #d8d8d8;
       --overlay: rgba(0,0,0,.58);
+      --touch-color: rgba(225, 235, 255, .9);
+      --touch-glow: rgba(175, 205, 255, .22);
     }
 
     [data-theme="light"] {
@@ -39,6 +42,8 @@
       --shadow: rgba(0,0,0,.08);
       --accent: #333333;
       --overlay: rgba(0,0,0,.35);
+      --touch-color: rgba(65, 82, 110, .82);
+      --touch-glow: rgba(100, 135, 185, .16);
     }
 
     * {
@@ -81,6 +86,76 @@
       height: 100%;
       z-index: 1;
       pointer-events: none;
+    }
+
+    /* Blue Archive-inspired screen touch effect */
+
+    .touch-effect {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      z-index: 9999;
+      pointer-events: none;
+      color: var(--touch-color);
+    }
+
+    .touch-effect-ring {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 30px;
+      height: 30px;
+      border: 1.4px solid var(--touch-color);
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--touch-glow), transparent 68%);
+      box-shadow: 0 0 15px var(--touch-glow), inset 0 0 9px var(--touch-glow);
+      transform: translate(-50%, -50%) scale(.25);
+      animation: touchRing .58s cubic-bezier(.16,.72,.25,1) forwards;
+    }
+
+    .touch-effect-ring::before,
+    .touch-effect-ring::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 1px solid var(--touch-color);
+      border-radius: 50%;
+      opacity: .55;
+    }
+
+    .touch-effect-ring::after {
+      inset: -5px;
+      opacity: .22;
+    }
+
+    .touch-effect-spark {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 4px;
+      border-radius: 1px;
+      background: var(--touch-color);
+      box-shadow: 0 0 7px var(--touch-color);
+      transform: translate(-50%, -50%) scale(.3);
+      animation: touchSpark .48s ease-out forwards;
+    }
+
+    @keyframes touchRing {
+      0% { opacity: .95; transform: translate(-50%, -50%) scale(.25); }
+      65% { opacity: .58; }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(2.15); }
+    }
+
+    @keyframes touchSpark {
+      0% { opacity: .9; transform: translate(-50%, -50%) scale(.3) rotate(45deg); }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0) rotate(135deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .touch-effect { display: none !important; }
     }
 
     .main,
@@ -986,6 +1061,42 @@
 
         setTheme(currentTheme === "dark" ? "light" : "dark");
       });
+
+      // =========================
+      // Blue Archive-inspired touch effect
+      // =========================
+
+      const touchMotionReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      document.addEventListener("pointerdown", event => {
+        if (touchMotionReduced || event.button !== 0) return;
+        if (event.target.closest("input, textarea, select, [contenteditable='true']")) return;
+
+        const effect = document.createElement("span");
+        effect.className = "touch-effect";
+        effect.setAttribute("aria-hidden", "true");
+        effect.style.left = event.clientX + "px";
+        effect.style.top = event.clientY + "px";
+
+        const ring = document.createElement("span");
+        ring.className = "touch-effect-ring";
+        effect.appendChild(ring);
+
+        const directions = [
+          [-17, -13], [17, -13], [-17, 13], [17, 13]
+        ];
+
+        directions.forEach(([dx, dy]) => {
+          const spark = document.createElement("span");
+          spark.className = "touch-effect-spark";
+          spark.style.setProperty("--dx", dx + "px");
+          spark.style.setProperty("--dy", dy + "px");
+          effect.appendChild(spark);
+        });
+
+        document.body.appendChild(effect);
+        window.setTimeout(() => effect.remove(), 650);
+      }, { passive: true });
 
       // =========================
       // 눈 내림 효과
