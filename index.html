@@ -11,7 +11,7 @@
     @font-face {
       font-family: "MyFont";
       src: url("./my-font.otf") format("opentype");
-      font-weight: 700;
+      font-weight: 400;
       font-style: normal;
       font-display: swap;
     }
@@ -46,6 +46,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: "MyFont", Arial, sans-serif;
     }
 
     body {
@@ -54,7 +55,7 @@
         radial-gradient(ellipse at 50% 45%, rgba(100,100,100,.09), transparent 60%),
         var(--bg);
       color: var(--text);
-      font-family: Arial, sans-serif;
+      font-family: "MyFont", Arial, sans-serif;
       overflow-x: hidden;
       transition: background .25s, color .25s;
     }
@@ -70,6 +71,23 @@
       opacity: .035;
       z-index: -1;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+    }
+
+    /* 은은한 눈 내림 효과 */
+
+    #snowCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .main,
+    .footer {
+      position: relative;
+      z-index: 2;
     }
 
     /* 음악 플레이어 */
@@ -167,6 +185,33 @@
     }
 
     .theme-button svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .snow-button {
+      position: fixed;
+      top: 28px;
+      right: 80px;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      transition: .2s;
+      z-index: 10;
+    }
+
+    .snow-button:hover {
+      background: var(--panel-hover);
+      transform: translateY(-2px);
+    }
+
+    .snow-button svg {
       width: 17px;
       height: 17px;
     }
@@ -664,6 +709,18 @@
       opacity: .7;
     }
 
+    .game-subgroup {
+      margin-top: 16px;
+    }
+
+    .game-subgroup-label {
+      margin-bottom: 2px;
+      color: var(--sub);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+    }
+
     /* 모바일 */
 
     @media (max-width: 650px) {
@@ -677,6 +734,11 @@
       .theme-button {
         top: 20px;
         right: 17px;
+      }
+
+      .snow-button {
+        top: 20px;
+        right: 63px;
       }
 
       .sidebar {
@@ -720,6 +782,7 @@
 
 <body>
   <div class="background-noise"></div>
+  <canvas id="snowCanvas" aria-hidden="true"></canvas>
 
   <!-- 음악 플레이어 -->
   <div class="music-player">
@@ -751,6 +814,17 @@
       stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="4"/>
       <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
+    </svg>
+  </button>
+
+  <!-- 눈 내림 효과 버튼 -->
+  <button class="snow-button" id="snowButton" type="button"
+    aria-label="눈 내리기 끄기" aria-pressed="true" title="눈 내리기 끄기">
+    <svg id="snowIcon" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.7"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2v20M4 7l16 10M20 7 4 17"/>
+      <path d="m9 4 3-2 3 2M9 20l3 2 3-2M3 10l1-3 3-1M17 18l3-1 1-3M17 6l3 1 1 3M3 14l1 3 3 1"/>
     </svg>
   </button>
 
@@ -850,20 +924,25 @@
             <strong>1,000 hrs</strong>
           </div>
           <div class="game-detail">
-            <span>IVAO</span>
-            <strong>ATC / PILOT</strong>
-          </div>
-          <div class="game-detail">
-            <span>ATC24</span>
-            <strong>PILOT</strong>
-          </div>
-          <div class="game-detail">
             <span>VATSIM</span>
             <strong>PILOT</strong>
           </div>
           <div class="game-detail">
-            <span>PFATC</span>
-            <strong>PILOT</strong>
+            <span>IVAO</span>
+            <strong>ATC / PILOT</strong>
+          </div>
+        </div>
+        <div class="game-subgroup">
+          <p class="game-subgroup-label">ETC.</p>
+          <div class="game-details">
+            <div class="game-detail">
+              <span>ATC24</span>
+              <strong>PILOT</strong>
+            </div>
+            <div class="game-detail">
+              <span>PFATC</span>
+              <strong>PILOT</strong>
+            </div>
           </div>
         </div>
       </section>
@@ -871,7 +950,7 @@
       <section class="game-section">
         <div class="game-title-row">
           <h3 class="game-title">Blue Archive</h3>
-          <span class="game-category">ROLE-PLAYING GAME</span>
+          <span class="game-category">SUBCULTURE</span>
         </div>
         <p class="game-info-label">PREFERENCES</p>
         <div class="game-details">
@@ -996,6 +1075,139 @@
 
         setTheme(currentTheme === "dark" ? "light" : "dark");
       });
+
+      // =========================
+      // 눈 내림 효과
+      // =========================
+
+      const snowCanvas = document.getElementById("snowCanvas");
+      const snowContext = snowCanvas.getContext("2d");
+      const snowButton = document.getElementById("snowButton");
+      const snowIcon = document.getElementById("snowIcon");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let snowEnabled = true;
+      let snowflakes = [];
+      let animationFrame = null;
+      let lastSnowFrame = 0;
+
+      try {
+        snowEnabled = localStorage.getItem("akkun-snow") !== "off";
+      } catch (error) {
+        console.warn("눈 내림 설정 불러오기 실패:", error);
+      }
+
+      function resizeSnowCanvas() {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        snowCanvas.width = Math.floor(window.innerWidth * ratio);
+        snowCanvas.height = Math.floor(window.innerHeight * ratio);
+        snowCanvas.style.width = window.innerWidth + "px";
+        snowCanvas.style.height = window.innerHeight + "px";
+        snowContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+        const count = Math.min(65, Math.max(24, Math.floor(
+          window.innerWidth * window.innerHeight / 22000
+        )));
+
+        snowflakes = Array.from({ length: count }, () => ({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          radius: Math.random() * 1.25 + 0.65,
+          speed: Math.random() * 0.45 + 0.35,
+          drift: Math.random() * 0.35 - 0.175,
+          opacity: Math.random() * 0.32 + 0.18
+        }));
+      }
+
+      function drawSnow(timestamp) {
+        if (!snowEnabled || document.hidden) {
+          animationFrame = null;
+          return;
+        }
+
+        if (timestamp - lastSnowFrame < 30) {
+          animationFrame = requestAnimationFrame(drawSnow);
+          return;
+        }
+        lastSnowFrame = timestamp;
+
+        snowContext.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        snowflakes.forEach(flake => {
+          flake.y += flake.speed;
+          flake.x += flake.drift + Math.sin(flake.y * 0.008) * 0.12;
+
+          if (flake.y > window.innerHeight + 4) {
+            flake.y = -4;
+            flake.x = Math.random() * window.innerWidth;
+          }
+          if (flake.x > window.innerWidth + 4) flake.x = -4;
+          if (flake.x < -4) flake.x = window.innerWidth + 4;
+
+          snowContext.beginPath();
+          snowContext.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+          snowContext.fillStyle = `rgba(235, 240, 248, ${flake.opacity})`;
+          snowContext.fill();
+        });
+
+        animationFrame = requestAnimationFrame(drawSnow);
+      }
+
+      function updateSnowButton() {
+        snowButton.setAttribute("aria-pressed", String(snowEnabled));
+        snowButton.setAttribute(
+          "aria-label",
+          snowEnabled ? "눈 내리기 끄기" : "눈 내리기 켜기"
+        );
+        snowButton.title = snowEnabled ? "눈 내리기 끄기" : "눈 내리기 켜기";
+
+        snowIcon.innerHTML = snowEnabled
+          ? `<path d="M12 2v20M4 7l16 10M20 7 4 17"/>
+             <path d="m9 4 3-2 3 2M9 20l3 2 3-2M3 10l1-3 3-1M17 18l3-1 1-3M17 6l3 1 1 3M3 14l1 3 3 1"/>`
+          : `<path d="M12 3v18M4.5 7.5l15 9M19.5 7.5l-15 9"/>
+             <path d="M5 5l14 14"/>`;
+      }
+
+      function startSnow() {
+        if (reducedMotion || !snowEnabled || animationFrame !== null) return;
+        lastSnowFrame = 0;
+        animationFrame = requestAnimationFrame(drawSnow);
+      }
+
+      function stopSnow() {
+        if (animationFrame !== null) {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
+        snowContext.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      }
+
+      snowButton.addEventListener("click", () => {
+        snowEnabled = !snowEnabled;
+        updateSnowButton();
+
+        try {
+          localStorage.setItem("akkun-snow", snowEnabled ? "on" : "off");
+        } catch (error) {
+          console.warn("눈 내림 설정 저장 실패:", error);
+        }
+
+        if (snowEnabled) startSnow();
+        else stopSnow();
+      });
+
+      window.addEventListener("resize", () => {
+        resizeSnowCanvas();
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stopSnow();
+        else if (snowEnabled) startSnow();
+      });
+
+      resizeSnowCanvas();
+      updateSnowButton();
+      if (!reducedMotion && snowEnabled) startSnow();
 
       // =========================
       // 팝업
