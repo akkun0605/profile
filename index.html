@@ -72,7 +72,7 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
     }
 
-    /* 상단 음악 플레이어 */
+    /* 음악 플레이어 */
 
     .music-player {
       position: fixed;
@@ -196,7 +196,9 @@
       height: 40px;
       display: grid;
       place-items: center;
+      border: 0;
       border-radius: 10px;
+      background: transparent;
       color: var(--sub);
       text-decoration: none;
       cursor: pointer;
@@ -226,9 +228,24 @@
       background: var(--border);
     }
 
-    .menu-text {
-      font-size: 11px;
-      font-weight: 600;
+    /* 게임 아이콘 */
+
+    .game-icon {
+      width: 19px;
+      height: 19px;
+      object-fit: contain;
+      filter: invert(1);
+      transition: .2s;
+    }
+
+    [data-theme="light"] .game-icon {
+      filter: none;
+    }
+
+    /* 메일 아이콘: 홈 아이콘과 같은 색상 */
+
+    .sidebar #emailMenu {
+      color: var(--text);
     }
 
     /* 메인 영역 */
@@ -607,10 +624,16 @@
 
     <div class="menu-divider"></div>
 
+    <!-- 게임 아이콘 -->
     <div class="menu-item" title="Blue Archive · MSFS2020">
-      <span class="menu-text">게임</span>
+      <img
+        class="game-icon"
+        src="https://cdn-icons-png.flaticon.com/512/1068/1068727.png"
+        alt="Games"
+      >
     </div>
 
+    <!-- Roblox -->
     <a class="menu-item"
       href="https://www.roblox.com/users/3966349192/profile"
       target="_blank" rel="noopener noreferrer" title="Roblox">
@@ -619,6 +642,7 @@
         alt="Roblox">
     </a>
 
+    <!-- 이메일 -->
     <button class="menu-item" id="emailMenu" title="이메일">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
