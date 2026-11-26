@@ -521,6 +521,149 @@
       cursor: pointer;
     }
 
+
+    /* 게임 소개 사이드 패널 */
+
+    .games-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, .38);
+      backdrop-filter: blur(3px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .28s ease, visibility .28s ease;
+    }
+
+    .games-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .games-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: min(430px, calc(100vw - 24px));
+      height: 100%;
+      height: 100dvh;
+      padding: 34px 30px;
+      overflow-y: auto;
+      border-left: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: -18px 0 55px rgba(0, 0, 0, .22);
+      transform: translateX(100%);
+      transition: transform .32s cubic-bezier(.22, .75, .25, 1);
+    }
+
+    .games-overlay.show .games-panel {
+      transform: translateX(0);
+    }
+
+    .games-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 34px;
+    }
+
+    .games-heading {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .games-close {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--sub);
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .games-close:hover {
+      color: var(--text);
+      background: var(--panel-hover);
+    }
+
+    .game-section + .game-section {
+      margin-top: 30px;
+      padding-top: 27px;
+      border-top: 1px solid var(--border);
+    }
+
+    .game-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 19px;
+    }
+
+    .game-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -.3px;
+    }
+
+    .game-category {
+      color: var(--sub);
+      font-size: 9px;
+      letter-spacing: 1.1px;
+      white-space: nowrap;
+    }
+
+    .game-info-label {
+      margin: 0 0 11px;
+      color: var(--sub);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+    }
+
+    .game-details {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .game-detail {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .game-detail span:first-child {
+      color: var(--sub);
+      flex-shrink: 0;
+    }
+
+    .game-detail strong {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .games-note {
+      margin-top: 30px;
+      color: var(--sub);
+      font-size: 10px;
+      letter-spacing: .6px;
+      text-align: center;
+      opacity: .7;
+    }
+
     /* 모바일 */
 
     @media (max-width: 650px) {
@@ -622,12 +765,12 @@
 
     <div class="menu-divider"></div>
 
-    <div class="menu-item" title="Blue Archive · MSFS2020">
+    <button class="menu-item" id="gamesMenu" title="Games" type="button" aria-label="게임 목록 열기">
       <img
         class="game-icon"
         src="https://cdn-icons-png.flaticon.com/512/1068/1068727.png"
-        alt="Games">
-    </div>
+        alt="">
+    </button>
 
     <!-- 왼쪽 Roblox -->
     <button class="menu-item" id="robloxMenu" title="Roblox" type="button">
@@ -681,6 +824,71 @@
       </div>
     </section>
   </main>
+
+  <!-- 게임 소개 사이드 패널 -->
+  <div class="games-overlay" id="gamesOverlay" aria-hidden="true">
+    <aside class="games-panel" role="dialog" aria-modal="true" aria-labelledby="gamesHeading">
+      <div class="games-header">
+        <h2 class="games-heading" id="gamesHeading">GAMES</h2>
+        <button class="games-close" id="gamesClose" type="button" aria-label="게임 패널 닫기">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <section class="game-section">
+        <div class="game-title-row">
+          <h3 class="game-title">Microsoft Flight Simulator 2020</h3>
+          <span class="game-category">FLIGHT SIMULATION</span>
+        </div>
+        <p class="game-info-label">FLIGHT EXPERIENCE</p>
+        <div class="game-details">
+          <div class="game-detail">
+            <span>PlayTime</span>
+            <strong>1,000 hrs</strong>
+          </div>
+          <div class="game-detail">
+            <span>IVAO</span>
+            <strong>ATC / PILOT</strong>
+          </div>
+          <div class="game-detail">
+            <span>ATC24</span>
+            <strong>PILOT</strong>
+          </div>
+          <div class="game-detail">
+            <span>VATSIM</span>
+            <strong>PILOT</strong>
+          </div>
+          <div class="game-detail">
+            <span>PFATC</span>
+            <strong>PILOT</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="game-section">
+        <div class="game-title-row">
+          <h3 class="game-title">Blue Archive</h3>
+          <span class="game-category">ROLE-PLAYING GAME</span>
+        </div>
+        <p class="game-info-label">PREFERENCES</p>
+        <div class="game-details">
+          <div class="game-detail">
+            <span>Favorite School</span>
+            <strong>Gehenna Academy</strong>
+          </div>
+          <div class="game-detail">
+            <span>Favorite Students</span>
+            <strong>Hina, Iroha</strong>
+          </div>
+        </div>
+      </section>
+
+      <p class="games-note">PERSONAL GAME PROFILE</p>
+    </aside>
+  </div>
 
   <footer class="footer">
     © 2026 AKKUN. ALL RIGHTS RESERVED.
@@ -809,6 +1017,30 @@
         }
       }
 
+      // 게임 소개 사이드 패널
+      const gamesOverlay = document.getElementById("gamesOverlay");
+
+      function openGames() {
+        gamesOverlay.classList.add("show");
+        gamesOverlay.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeGames() {
+        gamesOverlay.classList.remove("show");
+        gamesOverlay.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      document.getElementById("gamesMenu").addEventListener("click", openGames);
+      document.getElementById("gamesClose").addEventListener("click", closeGames);
+
+      gamesOverlay.addEventListener("click", event => {
+        if (event.target === gamesOverlay) {
+          closeGames();
+        }
+      });
+
       // Roblox 아이콘 두 곳
       document.getElementById("robloxMenu").addEventListener("click", () => {
         openModal("robloxModal");
@@ -849,6 +1081,7 @@
           document.querySelectorAll(".modal-overlay").forEach(modal => {
             modal.classList.remove("show");
           });
+          closeGames();
         }
       });
 
